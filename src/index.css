@@ -136,10 +136,31 @@ body {
   }
 
   .listen-bar {
-    height: 56px; /* ≥44 px tap area */
-  }
+    height: 80px;
+  } /* revert to full height */
   .listen-bar iframe {
-    height: 56px;
-    -webkit-overflow-scrolling: touch; /* smooth scroll suppression */
+    height: 80px;
   }
+}
+
+/* keep your existing hover / .active rules */
+.listen-bar iframe {
+  height: 0;
+  opacity: 0; /* collapsed */
+}
+.listen-bar:hover iframe,
+.listen-bar.active iframe {
+  height: 100%;
+  opacity: 1;
+  pointer-events: auto;
+}
+.listen-bar:hover span,
+.listen-bar.active span {
+  opacity: 0;
+}
+
+.listen-bar.active iframe {
+  height: 100% !important; /* force full height even after cursor leaves */
+  opacity: 1;
+  pointer-events: auto;
 }

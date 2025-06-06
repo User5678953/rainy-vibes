@@ -72,9 +72,10 @@ const remoteScenes = [
 export default function RemoteSceneGallery() {
   const [hoverIdx, setHoverIdx] = useState(null); // footer under cursor
   const [activeIdx, setActiveIdx] = useState(null); // playing card
-  const players = useRef({});
+  const players = useRef({}); // idx → iframe element
 
   const pause = (idx) => {
+    if (idx === null) return;
     const frame = players.current[idx];
     frame?.contentWindow?.postMessage(
       { method: "pause" },
@@ -86,6 +87,9 @@ export default function RemoteSceneGallery() {
     <div className="gallery">
       {remoteScenes.map(({ image }, idx) => {
         const playlistId = playlistIds[idx % playlistIds.length];
+
+        const isActive = activeIdx === idx;
+        const isHovered = hoverIdx === idx;
 
         return (
           <div key={idx} className="card">
@@ -101,27 +105,28 @@ export default function RemoteSceneGallery() {
 
             {/* Listen footer */}
             <div
-              className="listen-bar"
-              onMouseEnter={() => {
-                if (activeIdx !== idx) pause(activeIdx);
-                setHoverIdx(idx);
-                setActiveIdx(idx);
+              className={"listen-bar " + (isActive ? "active" : "")}
+              onMouseEnter={() => setHoverIdx(idx)}
+              onMouseLeave={() => {
+                if (!isActive) setHoverIdx(null);
               }}
-              onMouseLeave={() => setHoverIdx(null)}
+              onClick={() => {
+                if (isActive) {
+                  pause(idx); // stop this playlist
+                  setActiveIdx(null); // nothing playing
+                } else {
+                  pause(activeIdx); // pause the previous one
+                  setActiveIdx(idx); // set new active
+                }
+              }}
             >
-              {hoverIdx === idx || activeIdx === idx ? (
+              {isActive || isHovered ? (
                 <iframe
                   ref={(el) => (players.current[idx] = el)}
                   title={`spotify-${idx}`}
                   src={`https://open.spotify.com/embed/playlist/${playlistId}`}
                   allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
                   loading="lazy"
-                  style={{
-                    height: hoverIdx === idx ? 80 : 0,
-                    transition: "height .25s",
-                    width: "100%",
-                    border: "none",
-                  }}
                 />
               ) : (
                 <span>Listen →</span>
