@@ -1,9 +1,8 @@
+import RemoteSceneGallery from './components/RemoteSceneGallery';
+
 function App() {
-  return (
-    <>
-      {/* components will render here */}
-    </>
-  );
+  return <RemoteSceneGallery />;
 }
 
 export default App;
+

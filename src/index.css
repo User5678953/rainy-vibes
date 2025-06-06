@@ -1,0 +1,43 @@
+/* ==== base (already present) ==== */
+body {
+  background-color: #023c26;   /* deep forest green */
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  color: white;                /* default text color */
+}
+
+/* ==== gallery grid ==== */
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+  padding: 2rem;
+}
+
+/* ==== individual card ==== */
+.card {
+  width: 100%;                 /* it will inherit 280 px min from grid */
+  height: 340px;               /* 260 px image + 80 px Spotify iframe */
+  display: flex;
+  flex-direction: column;
+  background: #111;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px #0006;
+}
+
+/* clamp image to fixed height, crop if taller */
+.card img {
+  width: 100%;
+  height: 260px;
+  object-fit: cover;
+  object-position: center;
+}
+
+/* Spotify iframe takes the remaining 80 px */
+.card iframe {
+  width: 100%;
+  height: 80px;
+  border: none;
+}
