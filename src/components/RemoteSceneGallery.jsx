@@ -1,19 +1,16 @@
 // src/components/RemoteSceneGallery.jsx
-// Renders every remote GIF + a random chill lofi Spotify playlist.
-
-import React, { useState } from "react";
+import { useState, useRef } from "react";
+import "../index.css";
 
 const playlistIds = [
-  "37i9dQZF1DX4WYpdgoIcn6", // Chill Lofi Study Beats
-  "37i9dQZF1DX0SM0LYsmbMT", // lofi beats
-  "37i9dQZF1DXdLEN7aqioXM", // lofi chill
-  "37i9dQZF1DX6VdMW310YC7", // lofi hip hop music - beats to relax/study to
-  "37i9dQZF1DX7gIoKXt0gmx", // lofi sleep
-  "37i9dQZF1DX2yvmlOdMYzV", // lofi cafe
-  "37i9dQZF1DWUvZBXGjNCU4", // chill lofi study
-  "37i9dQZF1DXbITWG1ZJKYt", // lofi chill & jazzy
-  "37i9dQZF1DX0r3x8OtiwEM", // lofi chillhop
-  "37i9dQZF1DXa6YOhGMjjgx", // lofi chillhop beats
+  "37i9dQZF1DWWQRwui0ExPn",
+  "37i9dQZF1DX8Uebhn9wzrS",
+  "37i9dQZF1DX2PQDq3PdrHQ",
+  "5ce4gBznuECuLEWGxp8eQO",
+  "37i9dQZF1DXc8kgYqQLMfH",
+  "37i9dQZF1DWYoYGBbGKurt",
+  "0vvXsWCC9xrXsKd4FyS8kM",
+  "37i9dQZF1DXbITWG1ZJKYt",
 ];
 
 const remoteScenes = [
@@ -73,62 +70,62 @@ const remoteScenes = [
 ];
 
 export default function RemoteSceneGallery() {
-  const [hoverIdx, setHoverIdx] = useState(null);
+  const [hoverIdx, setHoverIdx] = useState(null); // footer under cursor
+  const [activeIdx, setActiveIdx] = useState(null); // playing card
+  const players = useRef({});
+
+  const pause = (idx) => {
+    const frame = players.current[idx];
+    frame?.contentWindow?.postMessage(
+      { method: "pause" },
+      "https://open.spotify.com"
+    );
+  };
 
   return (
     <div className="gallery">
       {remoteScenes.map(({ image }, idx) => {
-        const playlistId = playlistIds[idx];
+        const playlistId = playlistIds[idx % playlistIds.length];
+
         return (
           <div key={idx} className="card">
-            {/* Top: Click image to open in new tab */}
-            <div
-              className="gif-box clickable"
-              onClick={() => window.open(image, "_blank")}
-              style={{ cursor: "zoom-in" }}
+            {/* GIF */}
+            <a
+              href={image}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="gif-box"
             >
               <img src={image} alt={`scene-${idx}`} className="gif" />
-            </div>
-            {/* Bottom: Show Spotify on hover, no text */}
+            </a>
+
+            {/* Listen footer */}
             <div
-              className="spotify-toggle clickable"
-              onMouseEnter={() => setHoverIdx(idx)}
-              onMouseLeave={() => setHoverIdx(null)}
-              style={{
-                width: "100%",
-                textAlign: "center",
-                padding: "0.5rem",
-                background: "#222",
-                color: "#1db954",
-                fontWeight: "bold",
-                cursor: "pointer",
-                borderTop: "1px solid #333",
-                userSelect: "none",
-                minHeight: "40px",
-                transition: "background 0.2s",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                height: "80px", // Ensures the iframe fits perfectly
-                boxSizing: "border-box",
+              className="listen-bar"
+              onMouseEnter={() => {
+                if (activeIdx !== idx) pause(activeIdx);
+                setHoverIdx(idx);
+                setActiveIdx(idx);
               }}
+              onMouseLeave={() => setHoverIdx(null)}
             >
-              {hoverIdx === idx && playlistId ? (
+              {hoverIdx === idx || activeIdx === idx ? (
                 <iframe
+                  ref={(el) => (players.current[idx] = el)}
                   title={`spotify-${idx}`}
                   src={`https://open.spotify.com/embed/playlist/${playlistId}`}
-                  width="100%"
-                  height="80"
-                  frameBorder="0"
                   allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                  loading="lazy"
                   style={{
-                    display: "block",
-                    border: "none",
-                    height: "80px",
+                    height: hoverIdx === idx ? 80 : 0,
+                    transition: "height .25s",
                     width: "100%",
+                    border: "none",
                   }}
                 />
-              ) : null}
+              ) : (
+                <span>Listen →</span>
+              )}
             </div>
           </div>
         );
