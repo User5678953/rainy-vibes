@@ -1,26 +1,27 @@
 // src/components/RemoteSceneGallery.jsx
 // Renders every remote GIF + a random chill lofi Spotify playlist.
 
-const playlistIds = [
-  "37i9dQZF1DWWQRwui0ExPn", // lofi beats
-  "37i9dQZF1DX8Uebhn9wzrS", // chill lofi study beats
-  "37i9dQZF1DX2PQDq3PdrHQ", // lofi sleep
-  "5ce4gBznuECuLEWGxp8eQO", // lofi café
-  "37i9dQZF1DXc8kgYqQLMfH", // lush lofi
-  "37i9dQZF1DWYoYGBbGKurt", // lofi chill
-  "0vvXsWCC9xrXsKd4FyS8kM", // beats to relax/study to
-  "37i9dQZF1DXbITWG1ZJKYt", // lofi chill & jazzy
-];
+import React, { useState } from "react";
 
+const playlistIds = [
+  "37i9dQZF1DX4WYpdgoIcn6", // Chill Lofi Study Beats
+  "37i9dQZF1DX0SM0LYsmbMT", // lofi beats
+  "37i9dQZF1DXdLEN7aqioXM", // lofi chill
+  "37i9dQZF1DX6VdMW310YC7", // lofi hip hop music - beats to relax/study to
+  "37i9dQZF1DX7gIoKXt0gmx", // lofi sleep
+  "37i9dQZF1DX2yvmlOdMYzV", // lofi cafe
+  "37i9dQZF1DWUvZBXGjNCU4", // chill lofi study
+  "37i9dQZF1DXbITWG1ZJKYt", // lofi chill & jazzy
+  "37i9dQZF1DX0r3x8OtiwEM", // lofi chillhop
+  "37i9dQZF1DXa6YOhGMjjgx", // lofi chillhop beats
+];
 
 const remoteScenes = [
   {
     image:
       "https://uinona.net/wp-content/uploads/gif_729/animated_0000031174.webp",
   },
-  {
-    image: "https://media1.tenor.com/m/J7uxrx5tI4wAAAAd/chicken-cute.gif",
-  },
+  { image: "https://media1.tenor.com/m/J7uxrx5tI4wAAAAd/chicken-cute.gif" },
   {
     image:
       "https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExMW93YTJpY2w2cHh4bnJ2aHp2bGg4OGVtMHJ6MjA5N2F5YzhxM3pnbSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/QjH6Fuif3r2056Q38Q/giphy.gif",
@@ -65,36 +66,73 @@ const remoteScenes = [
     image:
       "https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExaTVyNXc0Y3E4ZWx2M2hsazRkcDBhZ2M3dHZmZ3UyMzV1djltbDljaCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/URExNvlgfjZ2rd5Gl0/giphy.gif",
   },
+  {
+    image:
+      "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNWM3NzdnN3lqc2p3Ynhwdzdpd3Z6a3I1N2YxYzV6c25zdGFqcXJ4NCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/Vd0yvC5g4G15rT62hL/giphy.gif",
+  },
 ];
 
-const getRandomQuery = (url) => {
-  const sep = url.includes("?") ? "&" : "?";
-  const random = Math.random().toString(36).substring(2, 10);
-  return `${sep}chill=lofi&r=${random}`;
-};
+export default function RemoteSceneGallery() {
+  const [hoverIdx, setHoverIdx] = useState(null);
 
-const getRandomPlaylistId = () =>
-  playlistIds[Math.floor(Math.random() * playlistIds.length)];
-
-const RemoteSceneGallery = () => (
-  <div className="gallery">
-    {remoteScenes.map(({ image }, idx) => {
-      const playlistId = getRandomPlaylistId();
-      const spotify = `https://open.spotify.com/embed/playlist/${playlistId}`;
-      return (
-        <div key={idx} className="card">
-          <img src={image} alt={`scene-${idx}`} />
-
-          <iframe
-            title={`spotify-${idx}`}
-            src={spotify + getRandomQuery(spotify)}
-            loading="lazy"
-            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-          />
-        </div>
-      );
-    })}
-  </div>
-);
-
-export default RemoteSceneGallery;
+  return (
+    <div className="gallery">
+      {remoteScenes.map(({ image }, idx) => {
+        const playlistId = playlistIds[idx];
+        return (
+          <div key={idx} className="card">
+            {/* Top: Click image to open in new tab */}
+            <div
+              className="gif-box clickable"
+              onClick={() => window.open(image, "_blank")}
+              style={{ cursor: "zoom-in" }}
+            >
+              <img src={image} alt={`scene-${idx}`} className="gif" />
+            </div>
+            {/* Bottom: Show Spotify on hover, no text */}
+            <div
+              className="spotify-toggle clickable"
+              onMouseEnter={() => setHoverIdx(idx)}
+              onMouseLeave={() => setHoverIdx(null)}
+              style={{
+                width: "100%",
+                textAlign: "center",
+                padding: "0.5rem",
+                background: "#222",
+                color: "#1db954",
+                fontWeight: "bold",
+                cursor: "pointer",
+                borderTop: "1px solid #333",
+                userSelect: "none",
+                minHeight: "40px",
+                transition: "background 0.2s",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                height: "80px", // Ensures the iframe fits perfectly
+                boxSizing: "border-box",
+              }}
+            >
+              {hoverIdx === idx && playlistId ? (
+                <iframe
+                  title={`spotify-${idx}`}
+                  src={`https://open.spotify.com/embed/playlist/${playlistId}`}
+                  width="100%"
+                  height="80"
+                  frameBorder="0"
+                  allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                  style={{
+                    display: "block",
+                    border: "none",
+                    height: "80px",
+                    width: "100%",
+                  }}
+                />
+              ) : null}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
